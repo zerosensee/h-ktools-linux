@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <!-- Не скачивать паки ASP.NET Core и т.п. для ссылок между проектами: сборка остаётся офлайновой
+         и на SDK из репозиториев дистрибутивов (Arch: dotnet-sdk-8.0 без aspnet-targeting-pack). -->
+    <DisableTransitiveFrameworkReferenceDownloads>true</DisableTransitiveFrameworkReferenceDownloads>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+  </PropertyGroup>
+</Project>
