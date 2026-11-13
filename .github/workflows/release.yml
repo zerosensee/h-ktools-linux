@@ -1,0 +1,97 @@
+name: Release
+
+# Публикация релиза:
+#   • вручную: Actions → Release → Run workflow (версия берётся из hktools/__init__.py)
+#   • автоматически: git push origin vX.Y.Z[-suffix]
+# Версии с дефисом (1.0.0-alpha.1, 1.1.0-rc.1) публикуются как пре-релиз.
+
+on:
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: "Отметить как пре-релиз (ранняя версия)"
+        type: boolean
+        default: true
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pytest
+      - run: XDG_CONFIG_HOME=/tmp/cfg python -m pytest -q tests/test_core.py
+
+  arch-package:
+    needs: test
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    container: archlinux:latest
+    steps:
+      - name: Подготовка Arch
+        run: |
+          pacman -Syu --noconfirm --needed base-devel git python python-gobject python-cairo gtk4 libadwaita ffmpeg python-pytest
+          useradd -m builder
+      - uses: actions/checkout@v4
+      - name: makepkg
+        run: |
+          chown -R builder "$GITHUB_WORKSPACE"
+          cd packaging/arch
+          sudo -u builder makepkg --nodeps --noconfirm
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          cp ./*.pkg.tar.zst "$GITHUB_WORKSPACE/dist/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arch-package
+          path: dist/*.pkg.tar.zst
+
+  release:
+    needs: [test, arch-package]
+    if: ${{ always() && needs.test.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Версия
+        id: v
+        run: |
+          VERSION=$(python3 -c "import re;print(re.search(r'VERSION = \"([^\"]+)\"', open('hktools/__init__.py').read()).group(1))")
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then TAG="${GITHUB_REF_NAME}"; else TAG="v${VERSION}"; fi
+          PRE=false
+          if [[ "$VERSION" == *-* ]] || [ "${{ inputs.prerelease }}" = "true" ]; then PRE=true; fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "pre=$PRE" >> "$GITHUB_OUTPUT"
+      - name: Исходники
+        run: |
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="hktools-${{ steps.v.outputs.version }}/" -o "dist/hktools-${{ steps.v.outputs.version }}.tar.gz" HEAD
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: arch-package
+          path: dist
+      - name: Контрольные суммы
+        run: cd dist && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - name: Публикация
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES=".github/release-notes/${{ steps.v.outputs.tag }}.md"
+          [ -f "$NOTES" ] || NOTES=CHANGELOG.md
+          FLAGS=()
+          if [ "${{ steps.v.outputs.pre }}" = "true" ]; then FLAGS+=(--prerelease --latest=false); fi
+          TITLE="hktools ${{ steps.v.outputs.version }}"
+          if [ "${{ steps.v.outputs.pre }}" = "true" ]; then TITLE="$TITLE (ранняя версия)"; fi
+          if gh release view "${{ steps.v.outputs.tag }}" >/dev/null 2>&1; then
+            gh release upload "${{ steps.v.outputs.tag }}" dist/* --clobber
+          else
+            gh release create "${{ steps.v.outputs.tag }}" dist/* --target "$GITHUB_SHA" \
+              --title "$TITLE" --notes-file "$NOTES" "${FLAGS[@]}"
+          fi
