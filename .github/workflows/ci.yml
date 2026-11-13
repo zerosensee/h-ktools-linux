@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Системные пакеты (GTK 4, libadwaita, ffmpeg, mkvtoolnix, Xvfb)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq --no-install-recommends libgtk-4-1 libadwaita-1-0 adwaita-icon-theme \
+            ffmpeg mkvtoolnix xvfb xauth fonts-dejavu-core fontconfig
+      - name: Сборка (без NuGet)
+        run: make build
+      - name: Самопроверка ядра
+        run: make test
+      - name: Тестовые файлы
+        run: bash .github/scripts/make-sample.sh /tmp/kt
+      - name: Инструменты через CLI
+        run: bash .github/scripts/cli-test.sh /tmp/kt
+      - name: Дымовой тест интерфейса (Xvfb)
+        run: |
+          export XDG_CONFIG_HOME=/tmp/gui/cfg XDG_CACHE_HOME=/tmp/gui/cache XDG_STATE_HOME=/tmp/gui/state
+          export XDG_RUNTIME_DIR=/tmp/gui/run HKTOOLS_SAMPLE=/tmp/kt/sample.mkv
+          mkdir -p "$XDG_RUNTIME_DIR" && chmod 700 "$XDG_RUNTIME_DIR"
+          timeout 300 make smoke
+          ls build/smoke

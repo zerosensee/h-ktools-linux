@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>hktools</AssemblyName>
+    <RootNamespace>HKTools</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>12</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- собирается под net8.0, запускается и на более новых рантаймах .NET (Arch: dotnet-runtime 9/10) -->
+    <RollForward>Major</RollForward>
+    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+    <TieredPGO>true</TieredPGO>
+    <Version>2.0.0</Version>
+    <InformationalVersion>2.0.0-alpha.1</InformationalVersion>
+    <Product>hktools</Product>
+    <Company>zerosensee</Company>
+    <Copyright>Copyright © 2026 zerosensee; K-Tools © 2026 krnzhnr</Copyright>
+    <NoWarn>$(NoWarn);CA1416;SYSLIB1054</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../HKTools.Core/HKTools.Core.csproj" />
+    <EmbeddedResource Include="Ui/style.css" LogicalName="style.css" />
+  </ItemGroup>
+</Project>

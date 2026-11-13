@@ -23,13 +23,13 @@ w() { printf '\033[1;33m==>\033[0m %s\n' "$*"; }
 
 if ! command -v pacman >/dev/null 2>&1; then
   w "pacman не найден: скрипт рассчитан на Arch-подобные системы. Установите зависимости вручную:"
-  w "python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1, python3-cairo, ffmpeg, mkvtoolnix, yt-dlp"
+  w ".NET SDK 8 (для сборки) и рантайм .NET ≥ 8, GTK 4, libadwaita, ffmpeg, mkvtoolnix, yt-dlp"
   DEPS=0
 fi
 
 if [[ $DEPS == 1 ]]; then
-  REQ=(python python-gobject python-cairo gtk4 libadwaita ffmpeg)
-  OPT=(mkvtoolnix-cli yt-dlp deno fdkaac libnotify python-numpy xdg-desktop-portal-gtk)
+  REQ=(dotnet-sdk-8.0 gtk4 libadwaita ffmpeg)
+  OPT=(mkvtoolnix-cli yt-dlp deno fdkaac libnotify xdg-desktop-portal-gtk)
   c "Обязательные пакеты: ${REQ[*]}"
   c "Рекомендуемые: ${OPT[*]}"
   sudo pacman -S --needed "${REQ[@]}" "${OPT[@]}"
@@ -54,10 +54,14 @@ case "$MODE" in
     (cd packaging/arch && makepkg -si --noconfirm --nocheck)
     ;;
   system)
+    c "Сборка (dotnet publish)"
+    make build
     c "Установка в /usr/local"
     sudo make install PREFIX=/usr/local
     ;;
   user)
+    c "Сборка (dotnet publish)"
+    make build
     c "Установка в ~/.local"
     make install PREFIX="$HOME/.local"
     case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) w "Добавьте ~/.local/bin в PATH" ;; esac

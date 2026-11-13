@@ -1,27 +1,46 @@
-# hktools for Linux — установка
-#   sudo make install                 # в /usr/local
-#   make install PREFIX=$HOME/.local  # для текущего пользователя (без root)
+# hktools (C# / .NET) — сборка и установка
+#   make                               # сборка в build/hktools
+#   sudo make install                  # в /usr/local
+#   make install PREFIX=$HOME/.local   # для текущего пользователя (без root)
 #   make install DESTDIR=$pkgdir PREFIX=/usr   # для PKGBUILD
+#
+# Нужен .NET SDK 8 (Arch: dotnet-sdk-8.0). Пакеты NuGet не используются — сборка работает без сети.
 
-PREFIX  ?= /usr/local
-DESTDIR ?=
-APP_ID  := io.github.zerosensee.HKTools
-LIBDIR  := $(PREFIX)/lib/hktools
-DATADIR := $(PREFIX)/share/hktools
-PYTHON  ?= python3
+PREFIX   ?= /usr/local
+DESTDIR  ?=
+APP_ID   := io.github.zerosensee.HKTools
+LIBDIR   := $(PREFIX)/lib/hktools
+DATADIR  := $(PREFIX)/share/hktools
+DOTNET   ?= dotnet
+CONFIG   ?= Release
+BUILDDIR := build/hktools
+export DOTNET_CLI_TELEMETRY_OPTOUT := 1
+export DOTNET_NOLOGO := 1
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE := 1
 
-.PHONY: all install uninstall test run check
+.PHONY: all build install uninstall test smoke run check clean
 
-all:
-	@echo "Цели: install, uninstall, test, run, check"
+all: build
+
+build:
+	$(DOTNET) publish src/HKTools.App/HKTools.App.csproj -c $(CONFIG) -o $(BUILDDIR) \
+		-p:UseAppHost=false -p:DebugType=none -p:GenerateDocumentationFile=false
+
+test:
+	$(DOTNET) run --project tests/HKTools.SelfTest -c $(CONFIG)
+
+# Дымовой тест интерфейса под Xvfb (снимки в build/smoke)
+smoke: build
+	HKTOOLS_DATA_DIR="$(CURDIR)/data" HKTOOLS_SMOKE="$(CURDIR)/build/smoke" GSK_RENDERER=cairo \
+		xvfb-run -a -s "-screen 0 1400x900x24" $(DOTNET) $(BUILDDIR)/hktools.dll
 
 install:
+	@test -f $(BUILDDIR)/hktools.dll || { echo "Сначала выполните: make"; exit 1; }
 	install -d "$(DESTDIR)$(LIBDIR)"
-	cp -r hktools "$(DESTDIR)$(LIBDIR)/"
-	find "$(DESTDIR)$(LIBDIR)" -name '__pycache__' -prune -exec rm -rf {} +
+	cp -r $(BUILDDIR)/. "$(DESTDIR)$(LIBDIR)/"
 	install -d "$(DESTDIR)$(PREFIX)/bin"
-	printf '#!/bin/sh\nexport HKTOOLS_DATA_DIR="%s"\nexport PYTHONPATH="%s$${PYTHONPATH:+:$$PYTHONPATH}"\nexec %s -m hktools "$$@"\n' \
-		"$(DATADIR)" "$(LIBDIR)" "$(PYTHON)" > "$(DESTDIR)$(PREFIX)/bin/hktools"
+	printf '#!/bin/sh\nexport HKTOOLS_DATA_DIR="%s"\nexport DOTNET_CLI_TELEMETRY_OPTOUT=1\nexec dotnet "%s/hktools.dll" "$$@"\n' \
+		"$(DATADIR)" "$(LIBDIR)" > "$(DESTDIR)$(PREFIX)/bin/hktools"
 	chmod 755 "$(DESTDIR)$(PREFIX)/bin/hktools"
 	install -Dm644 data/$(APP_ID).desktop "$(DESTDIR)$(PREFIX)/share/applications/$(APP_ID).desktop"
 	install -Dm644 data/$(APP_ID).metainfo.xml "$(DESTDIR)$(PREFIX)/share/metainfo/$(APP_ID).metainfo.xml"
@@ -45,11 +64,11 @@ uninstall:
 	      "$(DESTDIR)$(PREFIX)/share/metainfo/$(APP_ID).metainfo.xml" "$(DESTDIR)$(PREFIX)/share/kio/servicemenus/hktools.desktop"
 	for s in 16 32 48 64 128 256 512; do rm -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor/$${s}x$${s}/apps/$(APP_ID).png"; done
 
-test:
-	$(PYTHON) -m pytest -q tests/test_core.py
+run: build
+	HKTOOLS_DATA_DIR="$(CURDIR)/data" $(DOTNET) $(BUILDDIR)/hktools.dll
 
-run:
-	$(PYTHON) -m hktools
+check: build
+	$(DOTNET) $(BUILDDIR)/hktools.dll deps
 
-check:
-	$(PYTHON) -m hktools deps
+clean:
+	rm -rf build src/*/bin src/*/obj tests/*/bin tests/*/obj

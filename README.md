@@ -13,18 +13,24 @@
 > Ошибки этой версии — в [Issues этого репозитория](https://github.com/zerosensee/h-ktools-linux/issues),
 > а не автору K-Tools.
 
-> ⚠️ **Ранняя альфа-версия (1.0.0-alpha.1).** Приложение ещё не проверено на реальной системе с Hyprland
+> ⚠️ **Ранняя альфа-версия (2.0.0-alpha.1).** Приложение ещё не проверено на реальной системе с Hyprland
 > и видеокартой — возможны ошибки. Пожалуйста, сообщайте о них в Issues.
+
+> 🧬 **С версии 2.0 hktools написан на C# / .NET 8**, как и оригинальный K-Tools: компилируемый код,
+> многопоточная обработка без GIL, собственные привязки к GTK 4 / libadwaita через P/Invoke
+> (без сторонних пакетов NuGet — сборка работает полностью офлайн).
+> Первая альфа на Python сохранена в ветке [`python-legacy`](https://github.com/zerosensee/h-ktools-linux/tree/python-legacy)
+> и в релизе [1.0.0-alpha.1](https://github.com/zerosensee/h-ktools-linux/releases/tag/v1.0.0-alpha.1).
 
 hktools рассчитан на **Arch Linux, CachyOS и Ryoku** с **Hyprland**
 (работает и в niri, Sway, GNOME, KDE — везде, где есть GTK4).
 
 Оригинальный K-Tools написан на C# / WinUI 3 и использует встроенные `.exe` (eac3to, qaac, DEE, Win2D).
-hktools повторяет его функциональность на нативном стеке Linux:
+hktools тоже написан на C#, но вместо Windows-API использует нативный стек Linux:
 
 | K-Tools (Windows) | hktools (Linux) |
 |---|---|
-| WinUI 3, Mica, Win2D | **GTK4 + libadwaita**, Cairo; тема GTK (в т.ч. matugen на Ryoku) |
+| C# / .NET, WinUI 3, Mica, Win2D | **C# / .NET 8**, **GTK4 + libadwaita** (P/Invoke), Cairo; тема GTK (в т.ч. matugen на Ryoku) |
 | Встроенные бинарники в `bin/` | Пакеты дистрибутива: `ffmpeg`, `mkvtoolnix-cli`, `yt-dlp`, `whisper.cpp` (AUR) |
 | NVENC | **NVENC + VAAPI** (AMD/Intel) + CPU: x265, x264, **SVT-AV1** |
 | eac3to (скорость, сдвиг, каналы) | ffmpeg (`asetrate`/`rubberband`, `channelsplit`) и **mkvmerge `--sync`** — сдвиг бит-в-бит |
@@ -96,11 +102,15 @@ git clone https://github.com/zerosensee/h-ktools-linux && cd h-ktools-linux
 Вручную:
 
 ```bash
-sudo pacman -S --needed python python-gobject python-cairo gtk4 libadwaita ffmpeg \
-                        mkvtoolnix-cli yt-dlp deno fdkaac libnotify python-numpy
+sudo pacman -S --needed dotnet-sdk-8.0 gtk4 libadwaita ffmpeg \
+                        mkvtoolnix-cli yt-dlp deno fdkaac libnotify
 paru -S whisper.cpp-cuda      # или whisper.cpp-vulkan / whisper.cpp-hip / whisper.cpp
 cd packaging/arch && makepkg -si
 ```
+
+Готовая сборка из [релизов](https://github.com/zerosensee/h-ktools-linux/releases): пакет
+`hktools-*-any.pkg.tar.zst` (`sudo pacman -U …`) или переносимый архив `hktools-*-linux.tar.gz`
+(распаковать и запустить `./install.sh` внутри — нужен только рантайм .NET ≥ 8: `sudo pacman -S dotnet-runtime`).
 
 Проверка: `hktools deps` и `hktools hw` (либо страница **Зависимости** в приложении — там же кнопка
 «Установить недостающее», которая откроет ваш терминал с нужной командой pacman/paru).
@@ -180,7 +190,7 @@ hktools hw --refresh                      # перепроверить NVENC/VAA
 | Настройки | `~/.config/hktools/settings.json` |
 | Журнал (с ротацией) | `~/.local/state/hktools/hktools.log` |
 | Модели Whisper | `~/.local/share/hktools/whisper-models/` |
-| Кэш возможностей GPU | `~/.cache/hktools/hwcaps.json` |
+| Кэш возможностей GPU | `~/.cache/hktools/hwcaps-cs.json` |
 | Статус для панелей | `$XDG_RUNTIME_DIR/hktools/status.json` |
 
 Результаты по умолчанию сохраняются в подпапку `HKTools_Result` рядом с исходником (настраивается),
@@ -202,18 +212,24 @@ hktools hw --refresh                      # перепроверить NVENC/VAA
 ## 🛠️ Разработка
 
 ```bash
-python -m hktools                 # запуск из исходников
-make test                        # юнит-тесты ядра (pytest)
-xvfb-run python tests/gui_smoke.py /tmp/shots   # дымовой тест GUI со скриншотами
+make                 # dotnet publish → build/hktools (NuGet не нужен, работает без сети)
+make run             # запуск из исходников
+make test            # самопроверка ядра (tests/HKTools.SelfTest)
+make smoke           # дымовой тест GUI под Xvfb: обход страниц и окон, снимки в build/smoke
 ```
 
-Структура: `hktools/core` (схема настроек, запуск пакетов, вывод), `hktools/media` (процессы, ffprobe, ffmpeg,
-субтитры, осциллограммы), `hktools/scripts` (инструменты), `hktools/encoders` (CPU/NVENC/VAAPI), `hktools/ui`
-(GTK4/libadwaita). Новый инструмент — класс `Script` с декларативными полями `Field`: форма настроек,
-CLI и сохранение строятся автоматически.
+Структура:
+* `src/HKTools.Core` — ядро без GUI: схема настроек (`Field`), запуск пакетов (`BatchRunner`), процессы,
+  ffprobe/ffmpeg, субтитры, осциллограммы, энкодеры (CPU/NVENC/VAAPI), все 19 инструментов и CLI;
+* `src/HKTools.App` — интерфейс GTK4/libadwaita: `Native/` — тонкие привязки P/Invoke (GObject-свойства по имени,
+  сигналы, cairo), `Ui/` — окна и страницы;
+* `tests/HKTools.SelfTest` — тесты ядра без внешних пакетов.
+
+Новый инструмент — класс `Script` с декларативными полями `Field`: форма настроек, CLI и сохранение
+строятся автоматически. Формат `~/.config/hktools/settings.json` совместим с Python-версией.
 
 ## 📄 Лицензия и благодарности
 
 MIT, как и оригинальный проект. Идея, набор инструментов и логика обработки взяты из
 [K-Tools](https://github.com/krnzhnr/k-tools) © krnzhnr — спасибо автору. Код hktools написан заново
-на Python; подробности — в [LICENSE](LICENSE) и [NOTICE.md](NOTICE.md).
+на C# / .NET; подробности — в [LICENSE](LICENSE) и [NOTICE.md](NOTICE.md).

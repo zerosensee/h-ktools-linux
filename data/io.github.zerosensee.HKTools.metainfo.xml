@@ -20,6 +20,9 @@
   <developer id="io.github.zerosensee"><name>zerosensee</name></developer>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="2.0.0-alpha.1" date="2026-11-13" type="development">
+      <description><p>Rewritten in C# / .NET 8 (like the original K-Tools) with native GTK4/libadwaita bindings via P/Invoke.</p></description>
+    </release>
     <release version="1.0.0-alpha.1" date="2026-11-13" type="development">
       <description><p>Early alpha of the Linux fork: GTK4 + libadwaita, Hyprland integration, VAAPI support.</p></description>
     </release>

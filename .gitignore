@@ -1,9 +1,11 @@
-__pycache__/
-*.pyc
+bin/
+obj/
 /build/
 /dist/
-*.egg-info/
+*.user
+.vs/
+.idea/
 packaging/arch/pkg/
 packaging/arch/src/
 packaging/arch/*.pkg.tar.*
-.pytest_cache/
+packaging/arch/*.tar.gz
