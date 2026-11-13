@@ -81,7 +81,7 @@ hktools повторяет его функциональность на нати
 
 ---
 
-## 🚀 Установка (Arch / CachyOS / Ryoku)
+## 🚀 Установка (Arch / CachyOS)
 
 ```bash
 git clone https://github.com/zerosensee/h-ktools-linux && cd h-ktools-linux
