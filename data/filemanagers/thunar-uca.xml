@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Пользовательские действия Thunar для hktools.
+     Вставьте блоки <action> внутрь <actions> в ~/.config/Thunar/uca.xml (или добавьте через
+     «Правка → Настроить пользовательские действия»), затем перезапустите Thunar: thunar -q -->
+<actions>
+<action>
+  <icon>io.github.zerosensee.HKTools</icon>
+  <name>hktools: кодирование видео</name>
+  <command>hktools gui --tool video-encode %F</command>
+  <description>Открыть файлы в «Кодирование видео»</description>
+  <patterns>*.mkv;*.mp4;*.mov;*.webm;*.avi;*.m2ts;*.ts</patterns>
+  <video-files/>
+</action>
+<action>
+  <icon>io.github.zerosensee.HKTools</icon>
+  <name>hktools: кодирование аудио</name>
+  <command>hktools gui --tool audio-encode %F</command>
+  <description>Открыть файлы в «Кодирование аудио»</description>
+  <patterns>*</patterns>
+  <audio-files/>
+  <video-files/>
+</action>
+<action>
+  <icon>io.github.zerosensee.HKTools</icon>
+  <name>hktools: разборка контейнера</name>
+  <command>hktools gui --tool track-extractor %F</command>
+  <description>Извлечь дорожки и шрифты</description>
+  <patterns>*.mkv;*.mp4;*.mka;*.mks</patterns>
+  <video-files/>
+</action>
+</actions>

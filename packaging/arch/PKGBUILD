@@ -1,0 +1,54 @@
+# Maintainer: zerosensee
+# Независимый форк K-Tools (https://github.com/krnzhnr/k-tools) для Linux
+# Сборка из локальной копии репозитория:
+#   cd packaging/arch && makepkg -si
+pkgname=hktools
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Пакетная обработка медиа: кодирование (NVENC/VAAPI/x265), ремукс MKV, субтитры, Whisper, yt-dlp — GTK4/libadwaita"
+arch=('any')
+url="https://github.com/zerosensee/h-ktools-linux"
+license=('MIT')
+depends=(
+  'python'
+  'python-gobject'
+  'python-cairo'
+  'gtk4'
+  'libadwaita'
+  'ffmpeg'
+)
+optdepends=(
+  'mkvtoolnix-cli: сборка MKV, сдвиг и пересадка аудио без перекодирования'
+  'yt-dlp: загрузка медиа по ссылке'
+  'deno: JS-рантайм для yt-dlp (YouTube)'
+  'fdkaac: кодирование FDK-AAC / HE-AAC'
+  'whisper.cpp: распознавание речи (AUR; варианты -cuda, -vulkan, -hip)'
+  'libnotify: уведомления о завершении (notify-send)'
+  'python-numpy: быстрая авто-синхронизация по осциллограмме'
+  'wine: запуск qaac64.exe (Apple AAC)'
+  'libva-utils: диагностика VAAPI (vainfo)'
+  'xdg-desktop-portal-gtk: диалоги выбора файлов в Hyprland'
+)
+makedepends=('make')
+checkdepends=('python-pytest')
+source=()
+sha256sums=()
+
+_srcroot() {
+  # каталог репозитория относительно packaging/arch
+  realpath "${startdir}/../.."
+}
+
+check() {
+  cd "$(_srcroot)"
+  XDG_CONFIG_HOME="${srcdir}/cfg" python -m pytest -q tests/test_core.py
+}
+
+package() {
+  cd "$(_srcroot)"
+  make install DESTDIR="${pkgdir}" PREFIX=/usr PYTHON=/usr/bin/python3
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 NOTICE.md "${pkgdir}/usr/share/licenses/${pkgname}/NOTICE.md"
+  install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+  python -m compileall -q -d /usr/lib/hktools "${pkgdir}/usr/lib/hktools"
+}

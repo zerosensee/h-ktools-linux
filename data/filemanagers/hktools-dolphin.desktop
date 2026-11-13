@@ -1,0 +1,31 @@
+[Desktop Entry]
+Type=Service
+MimeType=video/*;audio/*;application/x-subrip;text/x-ssa;text/vtt;
+Actions=ktVideo;ktAudio;ktExtract;ktClean;ktSubs;
+X-KDE-Submenu=hktools
+Icon=io.github.zerosensee.HKTools
+
+[Desktop Action ktVideo]
+Name=Кодирование видео
+Icon=video-x-generic
+Exec=hktools gui --tool video-encode %F
+
+[Desktop Action ktAudio]
+Name=Кодирование аудио
+Icon=audio-x-generic
+Exec=hktools gui --tool audio-encode %F
+
+[Desktop Action ktExtract]
+Name=Разборка контейнера
+Icon=document-save
+Exec=hktools gui --tool track-extractor %F
+
+[Desktop Action ktClean]
+Name=Очистка метаданных
+Icon=edit-clear-all
+Exec=hktools gui --tool metadata-cleanup %F
+
+[Desktop Action ktSubs]
+Name=Конвертация субтитров
+Icon=font-x-generic
+Exec=hktools gui --tool subtitles-convert %F

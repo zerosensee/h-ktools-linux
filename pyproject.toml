@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hktools"
+version = "1.0.0"
+description = "Пакетная обработка медиа для Linux: ffmpeg, mkvtoolnix, yt-dlp, whisper.cpp (GTK4 + libadwaita)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = []  # PyGObject и pycairo ставятся из пакетов дистрибутива (python-gobject, python-cairo)
+
+[project.optional-dependencies]
+fast = ["numpy"]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/zerosensee/h-ktools-linux"
+Upstream = "https://github.com/krnzhnr/k-tools"
+
+[project.scripts]
+hktools = "hktools.__main__:entry"
+
+[tool.setuptools.packages.find]
+include = ["hktools*"]
+
+[tool.setuptools.package-data]
+"hktools.ui" = ["style.css"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

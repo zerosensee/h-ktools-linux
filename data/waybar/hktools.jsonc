@@ -1,0 +1,21 @@
+// Модуль Waybar: прогресс hktools в панели.
+// 1) Добавьте "custom/hktools" в modules-right (или другое место) в ~/.config/waybar/config.jsonc
+// 2) Вставьте этот блок в тот же файл
+// 3) Стили — из hktools.css
+{
+  "custom/hktools": {
+    "exec": "hktools waybar",
+    "return-type": "json",
+    "restart-interval": 5,
+    "format": "{icon} {}",
+    "format-icons": {
+      "running": "󰑮",
+      "done": "󰄬",
+      "failed": "󰀦",
+      "cancelled": "󰜺",
+      "idle": ""
+    },
+    "tooltip": true,
+    "on-click": "hktools"
+  }
+}

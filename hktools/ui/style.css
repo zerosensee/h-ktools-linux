@@ -1,0 +1,109 @@
+/* hktools — дополнительные стили поверх libadwaita (цвета берутся из темы, в т.ч. matugen/gtk.css) */
+
+.kt-card {
+  padding: 14px;
+  border-radius: 14px;
+  min-width: 250px;
+}
+.kt-card .kt-card-title {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+.kt-card .kt-card-desc {
+  opacity: 0.72;
+  font-size: 0.92em;
+}
+.kt-card.kt-unavailable {
+  opacity: 0.45;
+}
+.kt-card-icon {
+  border-radius: 12px;
+  padding: 10px;
+  min-width: 26px;
+  min-height: 26px;
+}
+
+.kt-pill {
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 0.8em;
+  font-weight: 700;
+}
+
+.kt-cat-video    { color: #1B9DE3; background: alpha(#1B9DE3, 0.16); }
+.kt-cat-audio    { color: #28CAC6; background: alpha(#28CAC6, 0.16); }
+.kt-cat-containers { color: #EB6E4D; background: alpha(#EB6E4D, 0.16); }
+.kt-cat-subtitles { color: #A878E8; background: alpha(#A878E8, 0.16); }
+.kt-cat-network  { color: #E84D6E; background: alpha(#E84D6E, 0.16); }
+.kt-cat-tools    { color: #F0A330; background: alpha(#F0A330, 0.16); }
+
+.kt-hero-title {
+  font-size: 2em;
+  font-weight: 800;
+}
+.kt-section-title {
+  font-weight: 800;
+  font-size: 1.15em;
+  margin-top: 18px;
+}
+
+.kt-item-row {
+  padding: 8px 10px;
+}
+.kt-item-row .kt-item-title {
+  font-weight: 600;
+}
+.kt-item-row progressbar trough,
+.kt-item-row progressbar progress {
+  min-height: 4px;
+}
+.kt-badge {
+  font-family: monospace;
+  font-size: 0.85em;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: alpha(currentColor, 0.08);
+}
+
+.kt-status-done      { color: @success_color; }
+.kt-status-partial   { color: @warning_color; }
+.kt-status-failed    { color: @error_color; }
+.kt-status-skipped   { opacity: 0.6; }
+.kt-status-cancelled { color: @warning_color; }
+
+.kt-drop-highlight {
+  background: alpha(@accent_bg_color, 0.10);
+  outline: 2px dashed alpha(@accent_bg_color, 0.7);
+  outline-offset: -8px;
+  border-radius: 12px;
+}
+
+.kt-bottom-bar {
+  padding: 8px 12px;
+}
+
+.kt-log view {
+  font-family: monospace;
+  font-size: 0.92em;
+}
+
+.kt-big-time {
+  font-family: monospace;
+  font-size: 2.2em;
+  font-weight: 700;
+}
+.kt-time-entry {
+  font-family: monospace;
+  font-size: 1.3em;
+}
+
+.kt-sub-deleted {
+  opacity: 0.45;
+}
+.kt-sub-forced-in {
+  color: @success_color;
+}
+
+.kt-nav-icon {
+  background: none;
+}

@@ -1,0 +1,34 @@
+[Desktop Entry]
+Type=Application
+Name=hktools
+GenericName=Media Batch Processor
+GenericName[ru]=Пакетная обработка медиа
+Comment=Batch transcoding, remuxing and metadata tools (ffmpeg, mkvtoolnix, yt-dlp, whisper.cpp)
+Comment[ru]=Пакетное кодирование, ремуксинг, субтитры и метаданные (ffmpeg, mkvtoolnix, yt-dlp, whisper.cpp)
+Exec=hktools %F
+TryExec=hktools
+Icon=io.github.zerosensee.HKTools
+Terminal=false
+Categories=AudioVideo;Video;Audio;AudioVideoEditing;GTK;
+Keywords=ffmpeg;mkv;mkvmerge;encode;transcode;subtitles;whisper;yt-dlp;nvenc;vaapi;кодирование;субтитры;
+StartupNotify=true
+StartupWMClass=io.github.zerosensee.HKTools
+DBusActivatable=false
+MimeType=video/x-matroska;video/mp4;video/quicktime;video/webm;video/x-msvideo;video/mp2t;audio/x-matroska;audio/mp4;audio/flac;audio/x-wav;audio/ac3;audio/eac3;audio/vnd.dts;audio/mpeg;audio/ogg;audio/opus;audio/aac;application/x-subrip;text/x-ssa;text/vtt;
+Actions=encode-video;encode-audio;extract;subtitles;
+
+[Desktop Action encode-video]
+Name=Кодирование видео
+Exec=hktools gui --tool video-encode %F
+
+[Desktop Action encode-audio]
+Name=Кодирование аудио
+Exec=hktools gui --tool audio-encode %F
+
+[Desktop Action extract]
+Name=Разборка контейнера
+Exec=hktools gui --tool track-extractor %F
+
+[Desktop Action subtitles]
+Name=Конвертация субтитров
+Exec=hktools gui --tool subtitles-convert %F

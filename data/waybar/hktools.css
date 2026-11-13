@@ -1,0 +1,16 @@
+/* Стили модуля hktools для ~/.config/waybar/style.css */
+#custom-hktools {
+  padding: 0 8px;
+}
+#custom-hktools.running {
+  color: #1B9DE3;
+}
+#custom-hktools.done {
+  color: #28CAC6;
+}
+#custom-hktools.failed {
+  color: #EB6E4D;
+}
+#custom-hktools.cancelled {
+  color: #F5A623;
+}

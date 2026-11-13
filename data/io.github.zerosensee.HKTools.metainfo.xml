@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.zerosensee.HKTools</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>hktools</name>
+  <summary>Batch media processing: encode, remux, subtitles, speech recognition</summary>
+  <summary xml:lang="ru">Пакетная обработка медиа: кодирование, ремукс, субтитры, распознавание речи</summary>
+  <description>
+    <p>GTK4/libadwaita front-end for ffmpeg, mkvtoolnix, yt-dlp and whisper.cpp with 18 batch tools:
+      video encoding (NVENC, VAAPI, x265, x264, SVT-AV1), audio encoding (FDK-AAC, FLAC, Opus…), downmix,
+      PAL/NTSC speed change, channel split, audio shift and transplant with waveform sync, MKV assembly,
+      stream management, extraction, subtitle conversion and shift, Whisper transcription, downloads and
+      bitrate analysis.</p>
+    <p>Independent Linux fork of K-Tools by krnzhnr (https://github.com/krnzhnr/k-tools). Not an official K-Tools release.</p>
+  </description>
+  <launchable type="desktop-id">io.github.zerosensee.HKTools.desktop</launchable>
+  <url type="homepage">https://github.com/zerosensee/h-ktools-linux</url>
+  <url type="bugtracker">https://github.com/zerosensee/h-ktools-linux/issues</url>
+  <developer id="io.github.zerosensee"><name>zerosensee</name></developer>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="1.0.0" date="2026-11-13">
+      <description><p>First release of the Linux fork: GTK4 + libadwaita, Hyprland integration, VAAPI support.</p></description>
+    </release>
+  </releases>
+</component>
