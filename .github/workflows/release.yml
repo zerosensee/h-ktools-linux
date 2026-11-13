@@ -12,6 +12,14 @@ on:
         description: "Отметить как пре-релиз (ранняя версия)"
         type: boolean
         default: true
+      recreate:
+        description: "Удалить существующий релиз и тег с этим номером и создать заново"
+        type: boolean
+        default: false
+      title_suffix:
+        description: "Добавка к названию релиза (например «Python»)"
+        type: string
+        default: ""
   push:
     tags: ["v*"]
 
@@ -87,7 +95,12 @@ jobs:
           [ -f "$NOTES" ] || NOTES=CHANGELOG.md
           FLAGS=()
           if [ "${{ steps.v.outputs.pre }}" = "true" ]; then FLAGS+=(--prerelease --latest=false); fi
+          if [ "${{ inputs.recreate }}" = "true" ]; then
+            gh release delete "${{ steps.v.outputs.tag }}" --cleanup-tag -y || true
+            git push origin --delete "refs/tags/${{ steps.v.outputs.tag }}" 2>/dev/null || true
+          fi
           TITLE="hktools ${{ steps.v.outputs.version }}"
+          if [ -n "${{ inputs.title_suffix }}" ]; then TITLE="$TITLE — ${{ inputs.title_suffix }}"; fi
           if [ "${{ steps.v.outputs.pre }}" = "true" ]; then TITLE="$TITLE (ранняя версия)"; fi
           if gh release view "${{ steps.v.outputs.tag }}" >/dev/null 2>&1; then
             gh release upload "${{ steps.v.outputs.tag }}" dist/* --clobber
