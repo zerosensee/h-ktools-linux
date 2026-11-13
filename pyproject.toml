@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hktools"
-version = "1.0.0"
+version = "1.0.0a1"
 description = "Пакетная обработка медиа для Linux: ffmpeg, mkvtoolnix, yt-dlp, whisper.cpp (GTK4 + libadwaita)"
 readme = "README.md"
 license = { text = "MIT" }

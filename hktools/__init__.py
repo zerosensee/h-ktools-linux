@@ -7,7 +7,7 @@
 
 APP_ID = "io.github.zerosensee.HKTools"
 APP_NAME = "hktools"
-VERSION = "1.0.0"
+VERSION = "1.0.0-alpha.1"
 REPO_URL = "https://github.com/zerosensee/h-ktools-linux"
 UPSTREAM_NAME = "K-Tools"
 UPSTREAM_URL = "https://github.com/krnzhnr/k-tools"

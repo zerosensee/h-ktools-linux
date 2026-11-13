@@ -13,6 +13,9 @@
 > Ошибки этой версии — в [Issues этого репозитория](https://github.com/zerosensee/h-ktools-linux/issues),
 > а не автору K-Tools.
 
+> ⚠️ **Ранняя альфа-версия (1.0.0-alpha.1).** Приложение ещё не проверено на реальной системе с Hyprland
+> и видеокартой — возможны ошибки. Пожалуйста, сообщайте о них в Issues.
+
 hktools рассчитан на **Arch Linux, CachyOS и Ryoku** с **Hyprland**
 (работает и в niri, Sway, GNOME, KDE — везде, где есть GTK4).
 

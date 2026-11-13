@@ -20,8 +20,8 @@
   <developer id="io.github.zerosensee"><name>zerosensee</name></developer>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="1.0.0" date="2026-11-13">
-      <description><p>First release of the Linux fork: GTK4 + libadwaita, Hyprland integration, VAAPI support.</p></description>
+    <release version="1.0.0-alpha.1" date="2026-11-13" type="development">
+      <description><p>Early alpha of the Linux fork: GTK4 + libadwaita, Hyprland integration, VAAPI support.</p></description>
     </release>
   </releases>
 </component>
